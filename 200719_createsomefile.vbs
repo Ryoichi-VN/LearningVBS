@@ -1,7 +1,9 @@
 
-' Note
-' 「Ref1.xlsx」の表から、情報を取り出す
-' 「tmp1.xlsx」の形式で特定のセルに行ごとに文字列を別のファイルに書き出す
+' Note & Hist
+' v1：「Ref1.xlsx」の表から、情報を取り出す
+' v2：「tmp1.xlsx」の形式で特定のセルに行ごとに文字列を別のファイルに書き出す
+' v3：文字列生成にはセル内の改行コードを埋め込んで改行表示対応
+
 
 
 Sub Main ()
@@ -41,7 +43,8 @@ Sub Main ()
     bodystring = ""
     
     For intC = 1 To objRefRange.Columns.Count
-      bodystring = bodystring & CStr(objRefRange(objRefRange.Row + intR -1 , objRefRange.Column + intC - 1))
+      bodystring = bodystring & CStr(objRefRange(objRefRange.Row + intR -1 , objRefRange.Column + intC - 1)) & Chr(10)
+      ' ※Chr(10)：セル内改行コード。通常のテキストで表示すると改行されない。
     Next
     'Msgbox bodystring
     
@@ -53,14 +56,15 @@ Sub Main ()
     
     ' テンプレートシートから生成シートに内容をコピー
     objTmpSheet.Copy(objWkBk.Sheets("dummy"))
+    Set objWkSt = objWkBk.Sheets("temp1")
     
-    objXls.DisplayAlerts = False      ' データがあるとアラート表示されるので一時的に消す。
+    objXls.DisplayAlerts = False
     objWkBk.Sheets("dummy").Delete
     objXls.DisplayAlerts = True
     'Msgbox "tempcopied"
     ' 文字列書き込み
-    objWkBk.Sheets("temp1").Cells(4,3).Value = bodystring
-    objWkBk.Sheets("temp1").Cells(4,3).NumberFormatLocal = "@"
+    objWkSt.Cells(6,3).Value = bodystring
+    objWkSt.Cells(6,3).NumberFormatLocal = "@"
     
     ' 同名のファイルが既に存在する場合は上書き
     '一時的にアラートを強制解除
